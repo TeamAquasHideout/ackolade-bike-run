@@ -4410,6 +4410,46 @@
       "secondary_tileset": "gTileset_MysteryEventsHouse",
       "border_filepath": "data/layouts/SootopolisCity_MysteryEventsHouse_1F_StairsUnblocked/border.bin",
       "blockdata_filepath": "data/layouts/SootopolisCity_MysteryEventsHouse_1F_StairsUnblocked/map.bin"
+    },
+    {
+      "id": "LAYOUT_FORTREE_LEVEL",
+      "name": "FortreeLevel_Layout",
+      "width": 60,
+      "height": 90,
+      "primary_tileset": "gTileset_General",
+      "secondary_tileset": "gTileset_Fortree",
+      "border_filepath": "data/layouts/FortreeLevel/border.bin",
+      "blockdata_filepath": "data/layouts/FortreeLevel/map.bin"
+    },
+    {
+      "id": "LAYOUT_BIKE_PATH_LEVEL",
+      "name": "BikePathLevel_Layout",
+      "width": 30,
+      "height": 140,
+      "primary_tileset": "gTileset_General",
+      "secondary_tileset": "gTileset_Mauville",
+      "border_filepath": "data/layouts/BikePathLevel/border.bin",
+      "blockdata_filepath": "data/layouts/BikePathLevel/map.bin"
+    },
+    {
+      "id": "LAYOUT_SKY_PILLAR_LEVEL",
+      "name": "SkyPillarLevel_Layout",
+      "width": 130,
+      "height": 40,
+      "primary_tileset": "gTileset_General",
+      "secondary_tileset": "gTileset_Pacifidlog",
+      "border_filepath": "data/layouts/SkyPillarLevel/border.bin",
+      "blockdata_filepath": "data/layouts/SkyPillarLevel/map.bin"
+    },
+    {
+      "id": "LAYOUT_CAVE_LEVEL",
+      "name": "CaveLevel_Layout",
+      "width": 50,
+      "height": 110,
+      "primary_tileset": "gTileset_General",
+      "secondary_tileset": "gTileset_Cave",
+      "border_filepath": "data/layouts/CaveLevel/border.bin",
+      "blockdata_filepath": "data/layouts/CaveLevel/map.bin"
     }
   ]
 }

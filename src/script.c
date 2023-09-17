@@ -5,6 +5,9 @@
 #include "util.h"
 #include "constants/event_objects.h"
 #include "constants/map_scripts.h"
+#include "field_player_avatar.h"
+#include "overworld.h"
+#include "main.h"
 
 #define RAM_SCRIPT_MAGIC 51
 
@@ -467,4 +470,47 @@ void InitRamScript_NoObjectEvent(u8 *script, u16 scriptSize)
     if (scriptSize > sizeof(gSaveBlock1Ptr->ramScript.data.script))
         scriptSize = sizeof(gSaveBlock1Ptr->ramScript.data.script);
     InitRamScript(script, scriptSize, MAP_GROUP(UNDEFINED), MAP_NUM(UNDEFINED), NO_OBJECT);
+}
+
+void ForcePlayerOntoBike(void)
+{
+    if (gPlayerAvatar.flags & PLAYER_AVATAR_FLAG_ON_FOOT)
+        SetPlayerAvatarTransitionFlags(PLAYER_AVATAR_FLAG_MACH_BIKE);
+    bulletTimeCheck = 0;
+    if(VarGet(VAR_BIKE_RUN) > 0)
+        bulletTimerAmount = BULLET_TIMER_AMOUNT;
+    //Overworld_SetSavedMusic(MUS_);
+    //Overworld_ChangeMusicTo(MUS_CYCLING);
+}
+
+void WarpBikeRun(void)
+{
+    gGlobalFieldTintMode = 0;
+    RemoveTintFromObjectEvents();
+    bulletTime = 0;
+    bulletTimeCheck = 1;
+    if(VarGet(VAR_BIKE_RUN) > 0)
+        bulletTimerAmount = BULLET_TIMER_AMOUNT;
+    switch(VarGet(VAR_BIKE_RUN))
+    {
+        case 1:
+            SetWarpDestination(MAP_GROUP(SKY_PILLAR_LEVEL), MAP_NUM(SKY_PILLAR_LEVEL), WARP_ID_NONE, 1, 2);
+            break;
+        case 0:
+            SetWarpDestination(MAP_GROUP(FORTREE_LEVEL), MAP_NUM(FORTREE_LEVEL), WARP_ID_NONE, 51, 86);
+            break;
+        case 2:
+            SetWarpDestination(MAP_GROUP(EVER_GRANDE_CITY_CHAMPIONS_ROOM), MAP_NUM(EVER_GRANDE_CITY_CHAMPIONS_ROOM), WARP_ID_NONE, 6, 12);
+            break;
+
+    }
+    
+    WarpIntoMap();
+    SetMainCallback2(CB2_LoadMap);
+}
+
+void SetBulletTime(void)
+{
+    bulletTimerAmount = BULLET_TIMER_AMOUNT;
+    return;
 }

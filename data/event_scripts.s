@@ -55,6 +55,7 @@
 #include "constants/union_room.h"
 #include "constants/vars.h"
 #include "constants/weather.h"
+#include "constants/rgb.h"
 	.include "asm/macros.inc"
 	.include "asm/macros/event.inc"
 	.include "constants/constants.inc"
@@ -995,6 +996,23 @@ Common_EventScript_RemoveStaticPokemon::
 	release
 	end
 
+Script_SetGrayscaleTint::
+	setptr GLOBAL_FIELD_TINT_GRAYSCALE, gGlobalFieldTintMode
+	callnative InitMapView
+	return
+
+Script_SetSepiaTint::
+	setptr GLOBAL_FIELD_TINT_SEPIA, gGlobalFieldTintMode
+	callnative InitMapView
+	return
+
+Script_RemoveTint::
+	setptr GLOBAL_FIELD_TINT_NONE, gGlobalFieldTintMode
+	callnative RemoveTintFromObjectEvents
+	callnative InitMapView
+	return
+
+
 Common_EventScript_LegendaryFlewAway::
 	fadescreenswapbuffers FADE_TO_BLACK
 	removeobject VAR_LAST_TALKED
@@ -1059,3 +1077,11 @@ Common_EventScript_LegendaryFlewAway::
 	.include "data/text/frontier_brain.inc"
 	.include "data/text/save.inc"
 	.include "data/text/birch_speech.inc"
+
+	.include "data/maps/FortreeLevel/scripts.inc"
+
+	.include "data/maps/BikePathLevel/scripts.inc"
+
+	.include "data/maps/SkyPillarLevel/scripts.inc"
+
+	.include "data/maps/CaveLevel/scripts.inc"

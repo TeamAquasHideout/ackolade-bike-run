@@ -24,6 +24,11 @@
 #include "main.h"
 #include "trainer_hill.h"
 #include "constants/rgb.h"
+#include "event_scripts.h"
+#include "script.h"
+#include "palette.h"
+
+extern u8 gGlobalFieldTintMode;
 
 static void VBlankIntr(void);
 static void HBlankIntr(void);
@@ -74,6 +79,9 @@ s8 gPcmDmaCounter;
 void *gAgbMainLoop_sp;
 
 static EWRAM_DATA u16 sTrainerId = 0;
+EWRAM_DATA u8 bulletTime = 0;
+EWRAM_DATA u8 bulletTimeCheck = 0;
+EWRAM_DATA u16 bulletTimerAmount = 0;
 
 //EWRAM_DATA void (**gFlashTimerIntrFunc)(void) = NULL;
 
@@ -415,10 +423,56 @@ static void SerialIntr(void)
 static void IntrDummy(void)
 {}
 
+static void SetGrayScale(void)
+{
+    gGlobalFieldTintMode = 1;
+    InitGrayScale();
+    return;
+}
+
+static void RemoveGrayScale(void)
+{
+    gGlobalFieldTintMode = 0;
+    RemoveTintFromObjectEvents();
+    return;
+}
+
 static void WaitForVBlank(void)
 {
     gMain.intrCheck &= ~INTR_FLAG_VBLANK;
     VBlankIntrWait();
+    if(JOY_HELD(R_BUTTON) && !bulletTimeCheck)
+    {
+        if(bulletTimerAmount > 0)
+        {
+            bulletTimerAmount--;
+        }
+        else
+        {
+            bulletTimerAmount = 0;
+            if(bulletTime == 1)
+            {
+                RemoveGrayScale();
+            }
+            bulletTime = 0;
+            return;
+        }
+        if(bulletTime == 0)
+        {
+            SetGrayScale();
+            bulletTime = 1;
+        }
+        VBlankIntrWait();
+        VBlankIntrWait();
+    }
+    else 
+    {
+        if(bulletTime == 1)
+        {
+            RemoveGrayScale();
+        }
+        bulletTime = 0;
+    }
 }
 
 void SetTrainerHillVBlankCounter(u32 *counter)

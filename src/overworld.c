@@ -66,6 +66,10 @@
 #include "constants/songs.h"
 #include "constants/trainer_hill.h"
 #include "constants/weather.h"
+#include "constants/rgb.h"
+#include <stdio.h>    //both of these required for DebugPrint.
+#include <stdarg.h>
+#include "string_util.h"
 
 struct CableClubPlayer
 {
@@ -91,6 +95,7 @@ struct CableClubPlayer
 #define FACING_FORCED_DOWN 8
 #define FACING_FORCED_LEFT 9
 #define FACING_FORCED_RIGHT 10
+static EWRAM_DATA s16 StepCounterCheck = 0;
 
 extern const struct MapLayout *const gMapLayouts[];
 extern const struct MapHeader *const *const gMapGroups[];
@@ -366,7 +371,7 @@ void DoWhiteOut(void)
     #endif
     HealPlayerParty();
     Overworld_ResetStateAfterWhiteOut();
-    SetWarpDestinationToLastHealLocation();
+    SetWarpDestination(MAP_GROUP(EVER_GRANDE_CITY_CHAMPIONS_ROOM), MAP_NUM(EVER_GRANDE_CITY_CHAMPIONS_ROOM), WARP_ID_NONE, 6, 12);
     WarpIntoMap();
 }
 
@@ -547,13 +552,25 @@ void SetObjEventTemplateMovementType(u8 localId, u8 movementType)
     }
 }
 
-static void InitMapView(void)
+void InitMapView(void)
 {
     ResetFieldCamera();
     CopyMapTilesetsToVram(gMapHeader.mapLayout);
     LoadMapTilesetPalettes(gMapHeader.mapLayout);
     DrawWholeMapView();
     InitTilesetAnimations();
+}
+
+void InitGrayScale(void)
+{
+    s32 paletteIndex;
+
+        ApplyGlobalFieldPaletteTint(gSprites[gPlayerAvatar.spriteId].oam.paletteNum);
+}
+
+void RemoveTintFromObjectEvents(void)
+{
+    RemoveTintFromObjectEventPalettes();
 }
 
 const struct MapLayout *GetMapLayout(void)
@@ -697,8 +714,8 @@ void SetWarpDestinationToLastHealLocation(void)
 void SetLastHealLocationWarp(u8 healLocationId)
 {
     const struct HealLocation *healLocation = GetHealLocation(healLocationId);
-    if (healLocation)
-        SetWarpData(&gSaveBlock1Ptr->lastHealLocation, healLocation->group, healLocation->map, WARP_ID_NONE, healLocation->x, healLocation->y);
+    SetWarpData(&gSaveBlock1Ptr->lastHealLocation, MAP_GROUP(BIKE_PATH_LEVEL), MAP_NUM(BIKE_PATH_LEVEL), WARP_ID_NONE, 14, 14);
+    
 }
 
 void UpdateEscapeWarp(s16 x, s16 y)
@@ -731,7 +748,7 @@ static void SetWarpDestinationToDiveWarp(void)
 
 void SetFixedHoleWarp(s8 mapGroup, s8 mapNum, s8 warpId, s8 x, s8 y)
 {
-    SetWarpData(&sFixedHoleWarp, mapGroup, mapNum, warpId, x, y);
+    SetWarpData(&sFixedHoleWarp, MAP_GROUP(SKY_PILLAR_LEVEL), MAP_NUM(SKY_PILLAR_LEVEL), WARP_ID_NONE, 1, 2);
 }
 
 void SetWarpDestinationToFixedHoleWarp(s16 x, s16 y)
@@ -739,7 +756,7 @@ void SetWarpDestinationToFixedHoleWarp(s16 x, s16 y)
     if (IsDummyWarp(&sFixedHoleWarp) == TRUE)
         sWarpDestination = gLastUsedWarp;
     else
-        SetWarpDestination(sFixedHoleWarp.mapGroup, sFixedHoleWarp.mapNum, WARP_ID_NONE, x, y);
+        SetWarpDestination(sFixedHoleWarp.mapGroup, sFixedHoleWarp.mapNum, WARP_ID_NONE, 1, 2);
 }
 
 static void SetWarpDestinationToContinueGameWarp(void)
@@ -1462,6 +1479,12 @@ bool32 IsOverworldLinkActive(void)
         return FALSE;
 }
 
+void StepCounterOverlayMain(void);
+void StepCounterOverlayDestroy(void);
+void StepCounterTask(u8 taskId);
+void UpdateStepCounter(void);
+void CreateStepCounter(void);
+
 static void DoCB1_Overworld(u16 newKeys, u16 heldKeys)
 {
     struct FieldInput inputStruct;
@@ -1469,6 +1492,9 @@ static void DoCB1_Overworld(u16 newKeys, u16 heldKeys)
     UpdatePlayerAvatarTransitionState();
     FieldClearPlayerInput(&inputStruct);
     FieldGetPlayerInput(&inputStruct, newKeys, heldKeys);
+    if (ArePlayerFieldControlsLocked()){
+        StepCounterOverlayDestroy();
+    }
     if (!ArePlayerFieldControlsLocked())
     {
         if (ProcessPlayerFieldInput(&inputStruct) == 1)
@@ -1478,6 +1504,8 @@ static void DoCB1_Overworld(u16 newKeys, u16 heldKeys)
         }
         else
         {
+            if(VarGet(VAR_BIKE_RUN) > 0)
+                StepCounterOverlayMain();
             PlayerStep(inputStruct.dpadDirection, newKeys, heldKeys);
         }
     }
@@ -1488,6 +1516,108 @@ void CB1_Overworld(void)
     if (gMain.callback2 == CB2_Overworld)
         DoCB1_Overworld(gMain.newKeys, gMain.heldKeys);
 }
+
+
+void StepCounterOverlayMain(void)
+{
+    if (!((gTasks[StepCounterCheck].func == StepCounterTask) && (gTasks[StepCounterCheck].isActive)))
+    {
+        if(!FuncIsActiveTask(StepCounterTask))
+        {
+            CreateStepCounter();
+        }
+    }
+}
+
+#define tDebugFrames data[0]
+#define tDBWindowData data[1]
+
+void StepCounterOverlayDestroy(void)
+{
+    u8 taskId;
+
+    if(FuncIsActiveTask(StepCounterTask))
+    {
+        taskId = FindTaskIdByFunc(StepCounterTask);
+        ClearStdWindowAndFrameToTransparent(gTasks[taskId].tDBWindowData, TRUE);
+        RemoveWindow(gTasks[taskId].tDBWindowData);
+        DestroyTask(taskId);
+    }
+}
+
+
+const u8 gText_BulletTime[] = _("Bullet Time: ");
+
+void StepCounterTask(u8 taskId)
+{
+    s16 *data = gTasks[taskId].data;
+    u8 tDebuggingWindow;
+    struct WindowTemplate template;
+    u32 i;
+    u16 textprinter;
+
+    if(data[0] == 0)
+    {
+        LoadMessageBoxAndBorderGfx();
+        StringCopy(gStringVar4, gText_BulletTime);
+
+        ConvertUIntToDecimalStringN(gStringVar3, bulletTimerAmount, STR_CONV_MODE_LEFT_ALIGN, 8); //the 4 here is number of digits. Given the limited horizontal space on the GBA, you may need to adjust as necessary for your printing needs.
+        StringAppend(gStringVar4, gStringVar3);
+
+
+        SetWindowTemplateFields(&template, 0, 1, 1, 20, 2, 15, 100);
+        tDebuggingWindow = AddWindow(&template);
+        FillWindowPixelBuffer(tDebuggingWindow, 0);
+        PutWindowTilemap(tDebuggingWindow);
+        CopyWindowToVram(tDebuggingWindow, 1);
+        textprinter = AddTextPrinterParameterized(tDebuggingWindow, 1, gStringVar4, 0, 0, 0, NULL);
+
+        tDBWindowData = tDebuggingWindow;
+        data[5] = ((textprinter << 8) >> 8); // right side
+        data[6] = (textprinter >> 8); // left side
+
+        data[0] = 1;
+
+    }
+
+    
+    if ((data[10] != bulletTimerAmount) && !IsTextPrinterActive(textprinter))
+    {
+        textprinter = (u16) data[5] || (u16) (data[6] << 8);
+        data[10] = GetGameStat(GAME_STAT_STEPS);
+        StringCopy(gStringVar4, gText_BulletTime);
+        ConvertUIntToDecimalStringN(gStringVar3, bulletTimerAmount, STR_CONV_MODE_LEFT_ALIGN, 6); //the 4 here is number of digits. Given the limited horizontal space on the GBA, you may need to adjust as necessary for your printing needs.
+        StringAppend(gStringVar4, gStringVar3);
+        FillWindowPixelBuffer(tDBWindowData, 0);
+        PutWindowTilemap(tDBWindowData);
+        CopyWindowToVram(tDBWindowData, 1);
+        AddTextPrinterParameterized(tDBWindowData, 1, gStringVar4, 0, 0, 0, NULL);
+        
+    }
+    else return;
+
+        //ClearStdWindowAndFrameToTransparent(tDBWindowData, TRUE);
+        //RemoveWindow(tDBWindowData);
+        //DestroyTask(taskId);
+
+}
+
+
+void CreateStepCounter(void)
+{
+
+    u8 taskId;
+    u8 tDebuggingWindow;
+    struct WindowTemplate template;
+    u32 i;
+    u16 textprinter;
+
+    
+    taskId = CreateTask(StepCounterTask, 0xFF);
+    StepCounterCheck = taskId;
+    
+}
+
 
 static void OverworldBasic(void)
 {
@@ -1566,7 +1696,7 @@ void CB2_NewGame(void)
     PlayTimeCounter_Start();
     ScriptContext_Init();
     UnlockPlayerFieldControls();
-    gFieldCallback = ExecuteTruckSequence;
+    //gFieldCallback = ExecuteTruckSequence;
     gFieldCallback2 = NULL;
     DoMapLoadLoop(&gMain.state);
     SetFieldVBlankCallback();

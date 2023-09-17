@@ -1002,9 +1002,6 @@ bool8 MetatileBehavior_IsWaterfall(u8 metatileBehavior)
 
 bool8 MetatileBehavior_IsFortreeBridge(u8 metatileBehavior)
 {
-    if (metatileBehavior == MB_FORTREE_BRIDGE)
-        return TRUE;
-    else
         return FALSE;
 }
 

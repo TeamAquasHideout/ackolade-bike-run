@@ -46,6 +46,7 @@ extern const u8 gGameLanguage;
 extern const u8 RomHeaderGameCode[GAME_CODE_LENGTH];
 extern const u8 RomHeaderSoftwareVersion;
 
+
 extern u16 gKeyRepeatStartDelay;
 extern bool8 gLinkTransferringData;
 extern struct Main gMain;
@@ -55,6 +56,10 @@ extern IntrFunc gIntrTable[];
 extern u8 gLinkVSyncDisabled;
 extern u32 IntrMain_Buffer[];
 extern s8 gPcmDmaCounter;
+extern u8 bulletTime;
+extern u8 bulletTimeCheck;
+extern u16 bulletTimerAmount;
+#define BULLET_TIMER_AMOUNT 1000
 
 void AgbMain(void);
 void AgbMainLoop(void);

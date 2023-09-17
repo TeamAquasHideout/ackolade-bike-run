@@ -51,9 +51,15 @@ extern void (*gFieldCallback)(void);
 extern bool8 (*gFieldCallback2)(void);
 extern u8 gLocalLinkPlayerId;
 extern u8 gFieldLinkPlayerCount;
+extern u8 gGlobalFieldTintMode;
 
 extern const struct UCoords32 gDirectionToVectors[];
 
+
+
+void InitMapView(void);
+void InitGrayScale(void);
+void RemoveTintFromObjectEvents(void);
 void DoWhiteOut(void);
 void Overworld_ResetStateAfterFly(void);
 void Overworld_ResetStateAfterTeleport(void);

@@ -4421,31 +4421,24 @@ static const struct TrainerMonItemCustomMoves sParty_Wallace[] = {
     },
     {
     .iv = 255,
-    .lvl = 55,
-    .species = SPECIES_TENTACRUEL,
+    .lvl = 56,
+    .species = SPECIES_GRENINJA,
     .heldItem = ITEM_NONE,
-    .moves = {MOVE_TOXIC, MOVE_HYDRO_PUMP, MOVE_SLUDGE_BOMB, MOVE_ICE_BEAM}
+    .moves = {MOVE_SPIKES, MOVE_HYDRO_PUMP, MOVE_DOUBLE_TEAM, MOVE_SHADOW_SNEAK}
     },
     {
     .iv = 255,
     .lvl = 56,
-    .species = SPECIES_LUDICOLO,
+    .species = SPECIES_TIRTOUGA,
     .heldItem = ITEM_NONE,
-    .moves = {MOVE_GIGA_DRAIN, MOVE_SURF, MOVE_LEECH_SEED, MOVE_DOUBLE_TEAM}
+    .moves = {MOVE_CRUNCH, MOVE_SURF, MOVE_ANCIENT_POWER, MOVE_RAIN_DANCE}
     },
     {
     .iv = 255,
     .lvl = 56,
-    .species = SPECIES_WHISCASH,
+    .species = SPECIES_DRAGALGE,
     .heldItem = ITEM_NONE,
-    .moves = {MOVE_EARTHQUAKE, MOVE_SURF, MOVE_AMNESIA, MOVE_HYPER_BEAM}
-    },
-    {
-    .iv = 255,
-    .lvl = 56,
-    .species = SPECIES_GYARADOS,
-    .heldItem = ITEM_NONE,
-    .moves = {MOVE_DRAGON_DANCE, MOVE_EARTHQUAKE, MOVE_HYPER_BEAM, MOVE_SURF}
+    .moves = {MOVE_DRAGON_TAIL, MOVE_HYDRO_PUMP, MOVE_TOXIC, MOVE_SLUDGE_BOMB}
     },
     {
     .iv = 255,
@@ -4453,6 +4446,13 @@ static const struct TrainerMonItemCustomMoves sParty_Wallace[] = {
     .species = SPECIES_MILOTIC,
     .heldItem = ITEM_SITRUS_BERRY,
     .moves = {MOVE_RECOVER, MOVE_SURF, MOVE_ICE_BEAM, MOVE_TOXIC}
+    },
+    {
+    .iv = 255,
+    .lvl = 60,
+    .species = SPECIES_KYOGRE_PRIMAL,
+    .heldItem = ITEM_BLUE_ORB,
+    .moves = {MOVE_THUNDERBOLT, MOVE_HYDRO_PUMP, MOVE_EARTHQUAKE, MOVE_ICE_BEAM}
     }
 };
 

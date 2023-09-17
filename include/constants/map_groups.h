@@ -63,6 +63,10 @@
 #define MAP_UNDERWATER_ROUTE129 (54 | (0 << 8))
 #define MAP_UNDERWATER_ROUTE105 (55 | (0 << 8))
 #define MAP_UNDERWATER_ROUTE125 (56 | (0 << 8))
+#define MAP_FORTREE_LEVEL       (57 | (0 << 8))
+#define MAP_BIKE_PATH_LEVEL     (58 | (0 << 8))
+#define MAP_SKY_PILLAR_LEVEL    (59 | (0 << 8))
+#define MAP_CAVE_LEVEL          (60 | (0 << 8))
 
 // gMapGroup_IndoorLittleroot
 #define MAP_LITTLEROOT_TOWN_BRENDANS_HOUSE_1F    (0 | (1 << 8))

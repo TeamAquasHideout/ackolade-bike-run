@@ -10,6 +10,10 @@ extern const u8 EventScript_TryDoNormalTrainerBattle[];
 extern const u8 EventScript_TryDoDoubleRematchBattle[];
 extern const u8 EventScript_TryDoRematchBattle[];
 
+extern const u8 Script_SetGrayscaleTint[];
+extern const u8 Script_SetSepiaTint[];
+extern const u8 Script_RemoveTint[];
+
 extern const u8 BerryTreeScript[];
 
 extern const u8 gTVBravoTrainerText00[];

@@ -536,3 +536,7 @@ gSpecials::
 	def_special TrySetBattleTowerLinkType
 	def_special SetTotemBoost
 	def_special TrySpecialOverworldEvo
+	def_special ForcePlayerOntoBike
+	def_special WarpBikeRun
+	def_special SetBulletTime
+

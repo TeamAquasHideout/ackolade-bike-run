@@ -9,6 +9,10 @@
 #include "sound.h"
 #include "constants/map_types.h"
 #include "constants/songs.h"
+#include "script.h"
+#include "event_data.h"
+#include "main.h"
+
 
 // this file's functions
 static void MovePlayerOnMachBike(u8, u16, u16);
@@ -907,8 +911,33 @@ static bool8 IsRunningDisallowedByMetatile(u8 tile)
 
 static void Bike_TryAdvanceCyclingRoadCollisions(void)
 {
-    if (gBikeCyclingChallenge != FALSE && gBikeCollisions < 100)
-        gBikeCollisions++;
+    //if (gBikeCyclingChallenge != FALSE && gBikeCollisions < 100)
+    //    gBikeCollisions++;
+
+    gGlobalFieldTintMode = 0;
+    RemoveTintFromObjectEvents();
+    bulletTime = 0;
+    bulletTimeCheck = 1;
+    if(VarGet(VAR_BIKE_RUN) > 0)
+        bulletTimerAmount = BULLET_TIMER_AMOUNT;
+    switch(VarGet(VAR_BIKE_RUN))
+    {
+        case 0:
+            SetWarpDestination(MAP_GROUP(BIKE_PATH_LEVEL), MAP_NUM(BIKE_PATH_LEVEL), WARP_ID_NONE, 14, 14);
+            break;
+        case 2:
+            SetWarpDestination(MAP_GROUP(SKY_PILLAR_LEVEL), MAP_NUM(SKY_PILLAR_LEVEL), WARP_ID_NONE, 1, 2);
+            break;
+        case 1:
+            SetWarpDestination(MAP_GROUP(FORTREE_LEVEL), MAP_NUM(FORTREE_LEVEL), WARP_ID_NONE, 51, 86);
+            break;
+
+    }
+
+    
+    
+    WarpIntoMap();
+    SetMainCallback2(CB2_LoadMap);
 }
 
 static bool8 CanBikeFaceDirOnMetatile(u8 direction, u8 tile)
