@@ -59,7 +59,7 @@ extern s8 gPcmDmaCounter;
 extern u8 bulletTime;
 extern u8 bulletTimeCheck;
 extern u16 bulletTimerAmount;
-#define BULLET_TIMER_AMOUNT 1000
+#define BULLET_TIMER_AMOUNT 500
 
 void AgbMain(void);
 void AgbMainLoop(void);
